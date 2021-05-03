@@ -114,7 +114,6 @@ char decideMove(){
   }
   if(posY-1<0 || grid[posX][posY-1][2]==1){
     movesRank[0] = 0;
-    Serial.println("no up");
   }
   
   //left
@@ -123,7 +122,6 @@ char decideMove(){
   }
   if(posX-1<0 || grid[posX-1][posY][2]==1){
     movesRank[1] = 0;
-    Serial.println("no left");
   }
 
   //down
@@ -132,7 +130,6 @@ char decideMove(){
   }
   if(posY+1>gridSizeY-1 || grid[posX][posY+1][2]==1){
     movesRank[2] = 0;
-    Serial.println("no down");
   }
 
   //right
@@ -141,8 +138,7 @@ char decideMove(){
   }
   if(posX+1>gridSizeX-1 || grid[posX+1][posY][2]==1){
       movesRank[3] = 0;
-      Serial.println("no right");
-    }
+  }
 
 
   //prevents bot from alternating between two spots
@@ -198,7 +194,6 @@ char decideMove(){
   }
   Serial.print("Rank: ");
   Serial.println(movesRank[big]);
-   Serial.println("\n");
   
   return moves[big];
 }
@@ -253,7 +248,7 @@ void loop() {
   int obstaclesX[3];
   int obstaclesY[3];
   for(int steps = 0; steps<15; steps++){
-    Serial.println("Deciding...");
+    Serial.println("\n\nDeciding...");
     delay(5000);
     char movement = decideMove();
     movePosition(movement);
@@ -270,8 +265,9 @@ void loop() {
     }
   }
   for(int i=0; i<3; i++){
-    Serial.print(obstaclesX[i]);
-    Serial.println(", ");
-    Serial.println(obstaclesY[i]);
+    //x and y are flipped
+    Serial.print(obstaclesY[i]);
+    Serial.print(", ");
+    Serial.println(obstaclesX[i]);
   }
 }
