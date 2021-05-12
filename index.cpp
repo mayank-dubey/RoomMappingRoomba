@@ -16,6 +16,18 @@ int trigPin = 7; //sets up pin to release sonar ping
 int echoPin = 5; //sets up pin to recieve the info on the sonar ping
 int ultra5V= 10;
 
+// right motor
+const int PIN_ACTIVATE_3_4 = 2;
+const int PIN_INPUT_3 = 3;
+const int PIN_INPUT_4 = 4;
+
+// left motor
+const int PIN_ACTIVATE_1_2 = 8;
+const int PIN_INPUT_1 = 9;
+const int PIN_INPUT_2 = 10;
+
+const int moveTime = 2000;
+
 //for remote control
 /*int upFreq = 3936631966;
 int downFreq = 356426642;
@@ -35,12 +47,53 @@ void initializeGrid(){
   }
 }
 
+void initMotor(int activationPin, int pin1, int pin2){
+  pinMode(activationPin, OUTPUT);
+  pinMode(pin1, OUTPUT);
+  pinMode(pin2, OUTPUT);
+  // Enable the motor driver
+  digitalWrite(activationPin, HIGH); 
+}
+
+/**
+ * Run a motor either clockwise or counter-clockwise
+ */
+void runMotor(int pin1, int pin2, bool clockwise = true){
+  if (clockwise) {
+    // Run the motor clockwise
+    digitalWrite(pin1, HIGH);
+    digitalWrite(pin2, LOW);
+  } 
+  else{
+    // Run the motor counter-clockwise
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, HIGH);
+  }
+}
+
 void movePosition(char m){
   int pos[] = {posX, posY};
   
   if(m=='w'){
     if(orientation != "up"){
+      
       //***rotate motors***
+      if(orientation=="down" || orientation=="right"){
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+        delay(moveTime);
+      }
+      if(orientation =="down"){
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+        delay(moveTime);
+      }
+      else{
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, false);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+        delay(moveTime);
+      }
+      
       Serial.print("rotating...   ");
       delay(3000);
       Serial.println("rotated up");
@@ -49,13 +102,34 @@ void movePosition(char m){
     else{
       grid[posX][posY][2] = 2;
       posY -=1;
-      //***move motors here***
+      
+      //**move motors**
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+      delay(moveTime);
     }
   }
   
   else if(m=='s'){
    if(orientation != "down"){
+     
     //***rotate motors***
+    if(orientation =="up" || orientation == "left"){
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+      delay(moveTime);
+    }
+    if(orientation == "up"){
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+      delay(moveTime);
+    }
+    else{
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, false);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+      delay(moveTime);
+    }
+    
       Serial.print("rotating...   ");
       delay(3000);
       Serial.println("rotated down");
@@ -64,13 +138,35 @@ void movePosition(char m){
    else{
      grid[posX][posY][2] = 2;
      posY +=1;
+     
     //***move motors here***
+    runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+    runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+    delay(moveTime);
+    
     }
   }
   
   else if(m=='d'){
    if(orientation != "right"){
+     
     //**rotate motors***
+    if(orientation == "left" || orientation == "down"){
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+      delay(moveTime);
+    }
+    if(orientation == "left"){
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+      delay(moveTime);
+    }
+    else{
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, false);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+      delay(moveTime);
+    }
+    
       Serial.print("rotating...   ");
       delay(3000);
       Serial.println("rotated right");
@@ -79,13 +175,35 @@ void movePosition(char m){
    else{
      grid[posX][posY][2] = 2;
      posX +=1;
+     
      //***move motors here***
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+      delay(moveTime);
+     
    }
   }
   
   else if(m=='a'){
     if(orientation != "left"){
+      
       //***rotate motors***
+      if(orientation =="right" || orientation == "up"){
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+        delay(moveTime);
+      }
+      if(orientation == "right"){
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, true);
+        delay(moveTime);
+      }
+      else{
+        runMotor(PIN_INPUT_1, PIN_INPUT_2, false);
+        runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+        delay(moveTime);
+      }
+      
       Serial.print("rotating...   ");
       delay(3000);
       Serial.println("rotated left");
@@ -94,7 +212,12 @@ void movePosition(char m){
     else{
       grid[posX][posY][2] = 2;
       posX -=1;
+      
       //***move motors here***
+      runMotor(PIN_INPUT_1, PIN_INPUT_2, true);
+      runMotor(PIN_INPUT_3, PIN_INPUT_4, false);
+      delay(moveTime);
+      
     }
   }
   position[0] = posX;
@@ -242,6 +365,8 @@ void setup() {
   pinMode(echoPin, INPUT);
   //IrReceiver.begin(IR_RECEIVE_PIN, true); // Start the receiver
   initializeGrid();
+  initMotor(PIN_ACTIVATE_1_2, PIN_INPUT_1, PIN_INPUT_2);
+  initMotor(PIN_ACTIVATE_3_4, PIN_INPUT_3, PIN_INPUT_4);
 }
 
 void loop() {
