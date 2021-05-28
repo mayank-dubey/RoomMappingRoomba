@@ -11,12 +11,10 @@ int gridSizeX = sizeof(grid)/sizeof(grid[0]);
 int gridSizeY = sizeof(grid[0])/sizeof(grid[0][0]);
 String orientation = "up";
 //char moves[] = {'w', 'a', 's', 'd'};
-int moveTime = 2000;
-int rotateTime = 0.7854*moveTime;
 
 int trigPin = 13; //sets up pin to release sonar ping
 int echoPin = 12; //sets up pin to recieve the info on the sonar ping
-int ultra5V= 11;
+//int ultra5V= 11;
 
 // Motor A connections
 int enA = 9;
@@ -27,6 +25,8 @@ int enB = 3;
 int in3 = 5;
 int in4 = 4;
 
+int moveTime = 500;
+int rotateTime = 0.7854*moveTime;
 
 //for remote control
 /*int upFreq = 3936631966;
@@ -34,7 +34,6 @@ int downFreq = 356426642;
 int leftFreq = 711683901;
 int rightFreq = 2614621136;
 int IR_RECEIVE_PIN = 11;*/
-
 
 
 
@@ -49,38 +48,56 @@ void initializeGrid(){
   }
 }
 
-
 void turnLeft(){
-  analogWrite(enA, 255);
-  analogWrite(enB, 255);
+  digitalWrite(enA, HIGH);
+  digitalWrite(enB, HIGH);
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(2000);
+  delay(rotateTime);
+  
+  digitalWrite(enA, LOW);
+  digitalWrite(enB, LOW);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
 }
 
 void turnRight(){
-  analogWrite(enA, 255);
-  analogWrite(enB, 255);
+  digitalWrite(enA, HIGH);
+  digitalWrite(enB, HIGH);
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  delay(2000);
+  delay(rotateTime);
+  
+  digitalWrite(enA, LOW);
+  digitalWrite(enB, LOW);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
 }
 
 void moveForward(){
-  analogWrite(enA, 255);
-  analogWrite(enB, 255);
+  digitalWrite(enA, HIGH);
+  digitalWrite(enB, HIGH);
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(2000);
+  delay(moveTime);
+  
+  digitalWrite(enA, LOW);
+  digitalWrite(enB, LOW);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
 }
-
-
 
 void movePosition(char m){
   int pos[] = {posX, posY};
@@ -118,7 +135,7 @@ void movePosition(char m){
    if(orientation != "down"){
     //***rotate motors***
     if(orientation =="up" || orientation == "left"){
-      turnleft();
+      turnLeft();
        
     }
     if(orientation == "up"){
@@ -151,7 +168,7 @@ void movePosition(char m){
        
     }
     if(orientation == "left"){
-      turnleft();
+      turnLeft();
        
     }
     else{
@@ -322,7 +339,7 @@ char decideMove(){
 }*/
 
 int ultraSonicSense(){
-  digitalWrite(ultra5V, HIGH);
+  //digitalWrite(ultra5V, HIGH);
   long duration;
   digitalWrite(trigPin, LOW);//idk what this does
   delayMicroseconds(2); //idk what this does
@@ -340,41 +357,28 @@ void setup() {
   posY = gridSizeY/2; //robot's curent y position (puts it in the middle of the map)
   position[0] = posX; 
   position[1] = posY;//robot's current coordinate
-  pinMode(ultra5V, OUTPUT);
+  //pinMode(ultra5V, OUTPUT);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   //IrReceiver.begin(IR_RECEIVE_PIN, true); // Start the receiver
   initializeGrid();
-  
-  // Set all the motor control pins to outputs
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
-  
-  // Turn off motors - Initial state
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
 }
 
 void loop() {
-  
-  //runs robot
   int obstaclesX[3];
   int obstaclesY[3];
   for(int steps = 0; steps<15; steps++){
     Serial.println("\n\nDeciding...");
-    delay(5000);
+    delay(1000);
     char movement = decideMove();
     movePosition(movement);
   }
-  //done running robot
-  
-  //prints mapped out map
   int c=0;
   Serial.println("DONE");
   for(int x = 0; x <gridSizeX; x++){
